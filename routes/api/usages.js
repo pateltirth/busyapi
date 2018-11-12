@@ -1,12 +1,30 @@
+
 module.exports = function(app){
     app.post('/api/usages', function(req, res){
 
-        // Store the supplied usage data
-        app.usages.push(req.body);
+        //console.log("reqest - ", req.body.patientId);
+        //Now we should be using the database 
+        // Store the supplied usage data into database
 
-        var usageId = app.usages.length;
-        console.log('Stored usage count: ' + usageId);
-
-        res.status(201).json({'id':usageId});
+        app.counterModel.findByIdAndUpdate(
+            {_id: 'usageId'}, 
+            {$inc: { seq: 1} }, 
+            {new: true, upsert: true},
+            function(error, counter)   {
+                if(error)
+                    return next(error);
+                //console.log(counter);
+                var savedata = new app.usageModel({
+                    'usageId': counter.seq,
+                    'patientId': req.body.patientId,
+                    'timestamp': req.body.timestamp,
+                    'medication': req.body.medication
+                }).save(function(err, result) {
+                    if (err) throw err;
+                    if(result) {
+                        res.status(201).json({'id':result.usageId});
+                    }
+                })
+        });
     });
 }

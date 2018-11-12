@@ -19,21 +19,34 @@ var app = express();
 var mongoose = require('mongoose');
 var Schema = mongoose.Schema;
 
-var schemaName = new Schema({
-  id: Number,
-  patientId: Number,
-  medication: String,
-	timestamp: String
+//schemas can go to saperate files 
+var Counter = new Schema({
+  _id: {type: String, required: true},
+  seq: { type: Number, default: 0 }
 }, {
-	collection: 'usages'
+	collection: 'Counter'
+});
+
+var Usages = new Schema({
+  usageId: {type: Number, required: true},
+  patientId: {type: Number, required: true},
+  medication: {type: String, required: true},
+	timestamp: {type: String, required: true}
+}, {
+	collection: 'Usages'
 });
 
 //connect to your database
-var Model = mongoose.model('Model', schemaName);
+var usageModel = mongoose.model('usageModel', Usages);
+var counterModel = mongoose.model('counterModel', Counter);
 mongoose.connect('mongodb://localhost:27017/propeller');
 
 var usages = [];
 app.usages = usages;
+
+//can be modified 
+app.usageModel = usageModel;
+app.counterModel = counterModel;
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
