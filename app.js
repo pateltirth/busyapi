@@ -11,6 +11,27 @@ var users = require('./routes/users');
 var app = express();
 
 // simple in-memory usage store
+// Important observations: 
+// 1. You can not persist data on server fails
+// 2. in-memory store have upper limit on memory 
+
+//So add mangoose schema 
+var mongoose = require('mongoose');
+var Schema = mongoose.Schema;
+
+var schemaName = new Schema({
+  id: Number,
+  patientId: Number,
+  medication: String,
+	timestamp: String
+}, {
+	collection: 'usages'
+});
+
+//connect to your database
+var Model = mongoose.model('Model', schemaName);
+mongoose.connect('mongodb://localhost:27017/propeller');
+
 var usages = [];
 app.usages = usages;
 
